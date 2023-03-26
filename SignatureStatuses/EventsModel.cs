@@ -278,7 +278,7 @@ namespace SignatureStatuses
     [BorshObject]
     public record CreateEggEvent
     {
-        public long ID { get; set; }
+        public long id { get; set; }
         public string Authority { get; set; }
         public string BeeType { get; set; }
         public string TokenAddress { get; set; }
@@ -289,7 +289,7 @@ namespace SignatureStatuses
 
         public CreateEggEvent(long id, string authority, string beeType, string tokenAddress, string collection, string gen, string url, long timestamp)
         {
-            ID = id;
+           this.id  = id;
             Authority = authority;
             BeeType = beeType;
             TokenAddress = tokenAddress;

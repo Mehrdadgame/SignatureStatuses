@@ -5,14 +5,10 @@ namespace SignatureStatuses
 {
 
     // Define your repository interface
-    public interface IMyRepository
-    {
-        Task<bool> CheckSignature(string id);
-        void SaveModelsToDatabase<T>(List<T> models, DbSet<T> dbSet) where T : class;
-    }
+  
 
     // Define your repository implementation class
-    public class MyRepository : IMyRepository
+    public class MyRepository
     {
         private readonly MyDbContext _dbContext;
 
@@ -23,7 +19,7 @@ namespace SignatureStatuses
 
 
 
-        public void SaveModelsToDatabase<T>(List<T> models, DbSet<T> dbSet) where T : class
+        public static void SaveModelsToDatabase<T>(List<T> models, DbSet<T> dbSet) where T : class
         {
             using (var dbContext = new MyDbContext())
             {
@@ -35,7 +31,7 @@ namespace SignatureStatuses
             }
         }
 
-        async Task<bool> IMyRepository.CheckSignature(string id)
+        async Task<bool> CheckSignature(string id)
         {
             var existingRow = await _dbContext.SignatureModels.FirstOrDefaultAsync(x => x.SignatureDataBase == id);
 
@@ -76,7 +72,8 @@ namespace SignatureStatuses
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer($"Data Source={DbPath}");
+            var dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SolanaData.mdf");
+            optionsBuilder.UseSqlServer($"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={dbPath};Integrated Security=True");
         }
     }
 

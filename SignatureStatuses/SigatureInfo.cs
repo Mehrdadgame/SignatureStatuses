@@ -21,7 +21,8 @@ namespace SignatureStatuses
         {
 
 
-
+            var db = new MyDbContext();
+           
             var transactionCount = 100;
             var signaturesAll = rpcClient.GetSignaturesForAddress("2Vez3DvZ2rdCQazovZpx5iLBNJwz5K84NXMXWyfcum7g", limit: (ulong)transactionCount);
             foreach (var signature in signaturesAll.Result)
@@ -95,6 +96,9 @@ namespace SignatureStatuses
                                 break;
                             case EventsModel.Events.CreateEggEvent:
                                 var create = CreateEggEvent.DesrelizeCreateEgg(decodedBytes);
+                                var createModel = new List<CreateEggEvent>();
+                                createModel.Add(create);
+                                MyRepository.SaveModelsToDatabase(createModel, db.CreateEggEvents);
                                 break;
                             case EventsModel.Events.UpgradeEvent:
                                 var upgradet = UpgradeEvent.DesrelizeUpgrade(decodedBytes);
