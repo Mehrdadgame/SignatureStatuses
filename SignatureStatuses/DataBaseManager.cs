@@ -1,48 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Hexarc.Borsh;
-using Hexarc.Borsh.Serialization;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace SignatureStatuses
 {
-    // Define your data model class
-    public class MyDataModel
-    {
-        private readonly List<Field> fields = new();
-        private int id;
-        private string? name;
-        [Key]
-        public int Id { get => id; set => id = value; }
-
-        public string Name { get => name; set => name = value; }
-
-        public List<Field> Fields => fields;
-    }
-
-   
-    public class Field
-    {
-        private string? name;
-        private string? type;
-        private bool index;
-        [Key]
-        public string Name { get => name; set => name = value; }
-        public string Type { get => type; set => type = value; }
-        public bool Index { get => index; set => index = value; }
-    }
-
 
     // Define your repository interface
     public interface IMyRepository
     {
-        MyDataModel GetById(int id);
-        void Save(MyDataModel data);
+        Task<bool> CheckSignature(string id);
+        void SaveModelsToDatabase<T>(List<T> models, DbSet<T> dbSet) where T : class;
     }
 
     // Define your repository implementation class
@@ -50,43 +16,63 @@ namespace SignatureStatuses
     {
         private readonly MyDbContext _dbContext;
 
-
-
-
         public MyRepository(MyDbContext dbContext)
         {
             _dbContext = dbContext;
-
-
         }
 
-        public MyDataModel GetById(int id) => _dbContext.MyDataModels.Find(id);
 
-        public void Save(MyDataModel data)
+
+        public void SaveModelsToDatabase<T>(List<T> models, DbSet<T> dbSet) where T : class
         {
-            if (data.Id == 0)
+            using (var dbContext = new MyDbContext())
             {
-                _dbContext.MyDataModels.Add(data);
+                foreach (var model in models)
+                {
+                    dbSet.Add(model);
+                }
+                dbContext.SaveChanges();
             }
-            else
+        }
+
+        async Task<bool> IMyRepository.CheckSignature(string id)
+        {
+            var existingRow = await _dbContext.SignatureModels.FirstOrDefaultAsync(x => x.SignatureDataBase == id);
+
+            if (existingRow == null)
             {
-                _dbContext.MyDataModels.Update(data);
+                var newRow = new SignatureModel()
+                {
+                    SignatureDataBase = existingRow.SignatureDataBase
+                };
+
+                _dbContext.SignatureModels.Add(newRow);
+                await _dbContext.SaveChangesAsync();
+                return true;
             }
-            _dbContext.SaveChanges();
+            return false;
         }
     }
 
     // Define your database context class
     public class MyDbContext : DbContext
     {
-        public DbSet<MyDataModel> MyDataModels { get; set; }
+        public DbSet<HatchEvent> Hatch { get; set; }
+        public DbSet<BreedEvent> BreedEvents { get; set; }
+        public DbSet<CreateEggEvent> CreateEggEvents { get; set; }
+        public DbSet<CreateItemEvent> CreateItemEvents { get; set; }
+        public DbSet<LoginEvent> LoginEvents { get; set; }
+        public DbSet<RerollEvent> RerollEvents { get; set; }
+        public DbSet<SaveEvent> SaveEvents { get; set; }
+        public DbSet<UpgradeEvent> UpgradeEvents { get; set; }
+        public DbSet<WithdrawEvent> WithdrawEvents { get; set; }
+        public DbSet<SignatureModel> SignatureModels { get; set; }
         public string DbPath { get; }
         public MyDbContext()
         {
-
             var folder = Environment.SpecialFolder.LocalApplicationData;
             var path = Environment.GetFolderPath(folder);
-            DbPath = System.IO.Path.Join(path, "SolDatabase.db");
+            DbPath = Path.Join(path, "SolanaData.dbo");
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

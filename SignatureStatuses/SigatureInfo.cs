@@ -19,25 +19,19 @@ namespace SignatureStatuses
 
         public void GetInfoSignature()
         {
-            //crete db
-            //var dbContext = new MyDbContext();
-            //var repository = new MyRepository(dbContext);
-            // Get a record by its ID
-            //var record = repository.GetById(1);
 
-            // Update a record
-            // record.Id = 10;
-            //  repository.Save(record);
 
 
             var transactionCount = 100;
             var signaturesAll = rpcClient.GetSignaturesForAddress("2Vez3DvZ2rdCQazovZpx5iLBNJwz5K84NXMXWyfcum7g", limit: (ulong)transactionCount);
             foreach (var signature in signaturesAll.Result)
             {
-              //  Console.WriteLine($"Sig: {signature.Signature}");
+                //  Console.WriteLine($"Sig: {signature.Signature}");
                 var transaction = rpcClient.GetTransaction(signature.Signature);
                 var typeEvent = new object();
                 if (transaction == null || transaction.Result.Transaction?.Message?.Instructions == null) continue;
+
+
 
                 var logMessages = transaction.Result.Meta?.LogMessages;
                 if (logMessages == null) continue;
@@ -46,11 +40,11 @@ namespace SignatureStatuses
                 {
 
                     var instruction = logMessages[i].StartsWith("Program log: Instruction: ");
-                  
+
                     if (instruction)
                     {
                         var replaseInstruction = logMessages[i].Replace("Program log: Instruction: ", "");
-                      //  Console.WriteLine($"instruction:{replaseInstruction}");
+                        //  Console.WriteLine($"instruction:{replaseInstruction}");
                         switch (replaseInstruction)
                         {
                             case "HatchNonGenesisBee":
@@ -75,15 +69,6 @@ namespace SignatureStatuses
                             case "UpgradeQueen":
                                 typeEvent = EventsModel.Events.UpgradeEvent;
                                 break;
-                           
-
-
-
-
-
-
-
-
                         }
                     }
 
@@ -122,7 +107,6 @@ namespace SignatureStatuses
                                 break;
                             case EventsModel.Events.SaveEvent:
                                 var save = SaveEvent.DeserializSaveEvent(decodedBytes);
-
                                 break;
                             default:
                                 break;

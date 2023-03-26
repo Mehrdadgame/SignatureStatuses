@@ -20,6 +20,10 @@ namespace SignatureStatuses
         }
     }
 
+    public record SignatureModel
+    {
+        public string? SignatureDataBase { get; set; }
+    }
 
     [BorshObject]
     public record RerollEvent
