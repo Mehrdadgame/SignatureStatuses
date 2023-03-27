@@ -5,45 +5,39 @@ namespace SignatureStatuses
 {
 
     // Define your repository interface
-  
+
 
     // Define your repository implementation class
     public class MyRepository
     {
-        private readonly MyDbContext _dbContext;
+       // private readonly MyDbContext _dbContext;
 
         public MyRepository(MyDbContext dbContext)
         {
-            _dbContext = dbContext;
+           // _dbContext = dbContext;
         }
 
 
 
-        public static void SaveModelsToDatabase<T>(List<T> models, DbSet<T> dbSet) where T : class
+        public static void SaveModelsToDatabase<T>(List<T> models, DbSet<T> dbSet, MyDbContext myDbContext) where T : class
         {
-            using (var dbContext = new MyDbContext())
+
+
+            foreach (var model in models)
             {
-                foreach (var model in models)
-                {
-                    dbSet.Add(model);
-                }
-                dbContext.SaveChanges();
+                dbSet.Add(model);
+
             }
+            myDbContext.SaveChanges();
+
         }
 
-        async Task<bool> CheckSignature(string id)
+        public static  bool CheckSignature(string id , MyDbContext _dbContext)
         {
-            var existingRow = await _dbContext.SignatureModels.FirstOrDefaultAsync(x => x.SignatureDataBase == id);
+            var existingRow =  _dbContext.SignatureModels.Find(id);
 
             if (existingRow == null)
             {
-                var newRow = new SignatureModel()
-                {
-                    SignatureDataBase = existingRow.SignatureDataBase
-                };
-
-                _dbContext.SignatureModels.Add(newRow);
-                await _dbContext.SaveChangesAsync();
                 return true;
             }
             return false;
@@ -63,17 +57,11 @@ namespace SignatureStatuses
         public DbSet<UpgradeEvent> UpgradeEvents { get; set; }
         public DbSet<WithdrawEvent> WithdrawEvents { get; set; }
         public DbSet<SignatureModel> SignatureModels { get; set; }
-        public string DbPath { get; }
-        public MyDbContext()
-        {
-            var folder = Environment.SpecialFolder.LocalApplicationData;
-            var path = Environment.GetFolderPath(folder);
-            DbPath = Path.Join(path, "SolanaData.dbo");
-        }
+
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SolanaData.mdf");
-            optionsBuilder.UseSqlServer($"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={dbPath};Integrated Security=True");
+            optionsBuilder.UseSqlServer("Data Source=(local);Integrated Security=True; Initial Catalog=SolanaDataBase;TrustServerCertificate=True;User ID=DESKTOP-NSMVPHG\\PC");
         }
     }
 

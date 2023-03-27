@@ -1,10 +1,13 @@
 ﻿
 using Hexarc.Borsh;
 using Hexarc.Borsh.Serialization;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SignatureStatuses
 {
-    public record EventsModel
+    public class EventsModel
     {
         public enum Events
         {
@@ -19,17 +22,18 @@ namespace SignatureStatuses
             SaveEvent
         }
     }
-
-    public record SignatureModel
+    [Table("SignatureModel")]
+    public class SignatureModel
     {
-        public string? SignatureDataBase { get; set; }
+        [Key]
+        public string SignatureDataBase { get; set; }
     }
-
+    [Table("RerollEvent")]
     [BorshObject]
-    public record RerollEvent
+    public class RerollEvent
     {
-
-
+        [Key]
+        public long UserId { get; set; }
         public long ID { get; set; }
         public string Authority { get; set; }
 
@@ -99,12 +103,12 @@ namespace SignatureStatuses
 
     }
 
-
+    [Table("HatchEvent")]
     [BorshObject]
-    public record HatchEvent
+    public class HatchEvent
     {
-
-
+        [Key]
+        public long UserId { get; set; }
         public ulong Id { get; set; }
 
 
@@ -168,9 +172,11 @@ namespace SignatureStatuses
             return new HatchEvent(id, authority, beetype, unique, tokenAddress, universe, collection, gen, url, timeStamp);
         }
     }
-    public record BreedEvent
+    [Table("BreedEvent")]
+    public class BreedEvent
     {
-
+        [Key]
+        public long UserId { get; set; }
 
         public long ID { get; set; }
 
@@ -232,10 +238,12 @@ namespace SignatureStatuses
 
         }
     }
+    [Table("CreateItemEvent")]
 
-    public record CreateItemEvent
+    public class CreateItemEvent
     {
-
+        [Key]
+        public long UserId { get; set; }
         public long ID { get; set; }
         public string? Authority { get; set; }
 
@@ -248,6 +256,7 @@ namespace SignatureStatuses
         public string? Stars { get; set; }
 
         public long Timestamp { get; set; }
+
 
         public CreateItemEvent(long iD, string? authority, string? id, string? iitemType, string? tokenAddress, string? stars, long timestamp)
         {
@@ -276,8 +285,11 @@ namespace SignatureStatuses
         }
     }
     [BorshObject]
-    public record CreateEggEvent
+    [Table("CreateEggEvent")]
+    public class CreateEggEvent
     {
+        [Key]
+        public long UserId { get; set; }
         public long id { get; set; }
         public string Authority { get; set; }
         public string BeeType { get; set; }
@@ -287,9 +299,10 @@ namespace SignatureStatuses
         public string Url { get; set; }
         public long Timestamp { get; set; }
 
+
         public CreateEggEvent(long id, string authority, string beeType, string tokenAddress, string collection, string gen, string url, long timestamp)
         {
-           this.id  = id;
+            this.id = id;
             Authority = authority;
             BeeType = beeType;
             TokenAddress = tokenAddress;
@@ -320,11 +333,11 @@ namespace SignatureStatuses
 
 
     }
-
-    public record UpgradeEvent
+    [Table("UpgradeEvent")]
+    public class UpgradeEvent
     {
-
-
+        [Key]
+        public long UserId { get; set; }
         public long Id { get; set; }
         public string? Authority { get; set; }
 
@@ -341,6 +354,7 @@ namespace SignatureStatuses
 
 
         public long? Timestamp { get; set; }
+
 
         public UpgradeEvent(long id, string? authority, string? entityType, string? itemAddress, string? upgradedEntityTokenAddress, string? gen, long? timestamp)
         {
@@ -369,9 +383,19 @@ namespace SignatureStatuses
         }
 
     }
-
-    public record LoginEvent
+    [Table("LoginEvent")]
+    public class LoginEvent
     {
+
+
+        public long ID { get; set; }
+        [Key]
+        public string? UserId { get; set; }
+
+        public string? UserKey { get; set; }
+
+        public string? PubKey { get; set; }
+
         public LoginEvent(long iD, string? userId, string? userKey, string? pubKey)
         {
             ID = iD;
@@ -379,14 +403,6 @@ namespace SignatureStatuses
             UserKey = userKey;
             PubKey = pubKey;
         }
-
-        public long ID { get; set; }
-        public string? UserId { get; set; }
-
-        public string? UserKey { get; set; }
-
-        public string? PubKey { get; set; }
-
         public static LoginEvent DesrelizeLoginEvent(byte[] data)
         {
             var reader = new BorshReader(data);
@@ -397,19 +413,12 @@ namespace SignatureStatuses
             return new LoginEvent(id, authority, userKey, pubKey);
         }
     }
-
-    public record WithdrawEvent
+    [Table("WithdrawEvent")]
+    public class WithdrawEvent
     {
-        public WithdrawEvent(long id, string? authority, string? treasury, string? cost, long timestamp)
-        {
-            this.ID = id;
-            this.Authority = authority;
-            Treasury = treasury;
-            Cost = cost;
-            Timestamp = timestamp;
-        }
-
-        public long ID { get; set; }
+        [Key]
+        public long UserId { get; set; }
+        public long id { get; set; }
         public string? Authority { get; set; }
 
         public string? Treasury { get; set; }
@@ -417,6 +426,15 @@ namespace SignatureStatuses
         public string? Cost { get; set; }
 
         public long Timestamp { get; set; }
+
+        public WithdrawEvent(long id, string? authority, string? treasury, string? cost, long timestamp)
+        {
+            this.id = id;
+            this.Authority = authority;
+            Treasury = treasury;
+            Cost = cost;
+            Timestamp = timestamp;
+        }
 
         public static WithdrawEvent DesrelizeLWithdrawEvent(byte[] data)
         {
@@ -430,18 +448,11 @@ namespace SignatureStatuses
             return new WithdrawEvent(id, authority, treasury, cost, timestamp);
         }
     }
-
-    public record SaveEvent
+    [Table("SaveEvent")]
+    public class SaveEvent
     {
-        public SaveEvent(long id, string? authority, string? beeMint, string? gen, long? timestamp)
-        {
-            Id = id;
-            Authority = authority;
-            BeeMint = beeMint;
-            Gen = gen;
-            Timestamp = timestamp;
-        }
-
+        [Key]
+        public long UserId { get; set; }
         public long Id { get; set; }
 
         public string? Authority { get; set; }
@@ -452,6 +463,14 @@ namespace SignatureStatuses
 
         public long? Timestamp { get; set; }
 
+        public SaveEvent(long id, string? authority, string? beeMint, string? gen, long? timestamp)
+        {
+            Id = id;
+            Authority = authority;
+            BeeMint = beeMint;
+            Gen = gen;
+            Timestamp = timestamp;
+        }
 
 
         public static SaveEvent DeserializSaveEvent(byte[] data)

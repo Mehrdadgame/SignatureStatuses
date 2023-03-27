@@ -10,6 +10,7 @@ using System.Drawing;
 using Org.BouncyCastle.Utilities;
 using Hexarc.Borsh.Serialization;
 using Hexarc.Borsh.Serialization.Metadata;
+using Microsoft.EntityFrameworkCore;
 
 namespace SignatureStatuses
 {
@@ -17,13 +18,15 @@ namespace SignatureStatuses
     {
         private static readonly IRpcClient rpcClient = ClientFactory.GetClient(Cluster.DevNet);
 
-        public void GetInfoSignature()
+        public  void GetInfoSignature()
         {
 
 
             var db = new MyDbContext();
+
            
-            var transactionCount = 100;
+
+            var transactionCount = 10;
             var signaturesAll = rpcClient.GetSignaturesForAddress("2Vez3DvZ2rdCQazovZpx5iLBNJwz5K84NXMXWyfcum7g", limit: (ulong)transactionCount);
             foreach (var signature in signaturesAll.Result)
             {
@@ -32,6 +35,10 @@ namespace SignatureStatuses
                 var typeEvent = new object();
                 if (transaction == null || transaction.Result.Transaction?.Message?.Instructions == null) continue;
 
+                var sigcheck =  MyRepository.CheckSignature(signature.Signature, db);
+                if (sigcheck) continue;
+                var sigModel = new List<SignatureModel> { new SignatureModel { SignatureDataBase = signature.Signature } };
+                MyRepository.SaveModelsToDatabase(sigModel, db.SignatureModels, db);
 
 
                 var logMessages = transaction.Result.Meta?.LogMessages;
@@ -84,35 +91,50 @@ namespace SignatureStatuses
                         {
                             case EventsModel.Events.RerollEvent:
                                 var reoll = RerollEvent.DesrelizeLRerollEvent(decodedBytes);
+                                var reollmModel = new List<RerollEvent> { reoll };
+                                MyRepository.SaveModelsToDatabase(reollmModel, db.RerollEvents, db);
                                 break;
                             case EventsModel.Events.HatchEvent:
                                 var hatch = HatchEvent.DeserializeHatchEvent(decodedBytes);
+                                var hatchModel = new List<HatchEvent> { hatch };
+                                MyRepository.SaveModelsToDatabase(hatchModel, db.Hatch, db);
                                 break;
                             case EventsModel.Events.BreedEvent:
                                 var breed = BreedEvent.DeserializeBreedEvent(decodedBytes);
+                                var breedModel = new List<BreedEvent> { breed };
+                                MyRepository.SaveModelsToDatabase(breedModel, db.BreedEvents, db);
                                 break;
                             case EventsModel.Events.CreateItemEvent:
-                                var createdItem = CreateEggEvent.DesrelizeCreateEgg(decodedBytes);
+                                var createdItem = CreateItemEvent.DeserializeCreateItemEventEvent(decodedBytes);
+                                var createItemModelList = new List<CreateItemEvent> { createdItem };
+                                MyRepository.SaveModelsToDatabase(createItemModelList, db.CreateItemEvents, db);
                                 break;
                             case EventsModel.Events.CreateEggEvent:
                                 var create = CreateEggEvent.DesrelizeCreateEgg(decodedBytes);
-                                var createModel = new List<CreateEggEvent>();
-                                createModel.Add(create);
-                                MyRepository.SaveModelsToDatabase(createModel, db.CreateEggEvents);
+                                var createModel = new List<CreateEggEvent> { create };
+                                MyRepository.SaveModelsToDatabase(createModel, db.CreateEggEvents, db);
                                 break;
                             case EventsModel.Events.UpgradeEvent:
                                 var upgradet = UpgradeEvent.DesrelizeUpgrade(decodedBytes);
+                                var upgradeModel = new List<UpgradeEvent> { upgradet };
+                                MyRepository.SaveModelsToDatabase(upgradeModel, db.UpgradeEvents, db);
                                 break;
                             case EventsModel.Events.LoginEvent:
                                 var loginEvent = LoginEvent.DesrelizeLoginEvent(decodedBytes);
+                                var loginModel = new List<LoginEvent> { loginEvent };
+                                MyRepository.SaveModelsToDatabase(loginModel, db.LoginEvents, db);
                                 break;
                             case EventsModel.Events.WithdrawEvent:
                                 var wtihdrow = WithdrawEvent.DesrelizeLWithdrawEvent(decodedBytes);
+                                var withdrowModel = new List<WithdrawEvent> { wtihdrow };
+                                MyRepository.SaveModelsToDatabase(withdrowModel, db.WithdrawEvents, db);
+
                                 break;
                             case EventsModel.Events.SaveEvent:
                                 var save = SaveEvent.DeserializSaveEvent(decodedBytes);
-                                break;
-                            default:
+                                var saveModel = new List<SaveEvent> { save };
+                                MyRepository.SaveModelsToDatabase(saveModel, db.SaveEvents, db);
+
                                 break;
                         }
 
