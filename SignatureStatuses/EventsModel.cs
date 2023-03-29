@@ -26,7 +26,17 @@ namespace SignatureStatuses
     public class SignatureModel
     {
         [Key]
+        public int ID { get; set; }
+
         public string SignatureDataBase { get; set; }
+
+
+    }
+    [Table("LastSignature")]
+    public class LastSignature
+    {
+        [Key]
+        public string Signature { get; set; }
     }
     [Table("RerollEvent")]
     [BorshObject]

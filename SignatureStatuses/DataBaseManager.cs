@@ -10,11 +10,11 @@ namespace SignatureStatuses
     // Define your repository implementation class
     public class MyRepository
     {
-       // private readonly MyDbContext _dbContext;
+        // private readonly MyDbContext _dbContext;
 
         public MyRepository(MyDbContext dbContext)
         {
-           // _dbContext = dbContext;
+            // _dbContext = dbContext;
         }
 
 
@@ -32,16 +32,7 @@ namespace SignatureStatuses
 
         }
 
-        public static  bool CheckSignature(string id , MyDbContext _dbContext)
-        {
-            var existingRow =  _dbContext.SignatureModels.Find(id);
-
-            if (existingRow == null)
-            {
-                return true;
-            }
-            return false;
-        }
+       
     }
 
     // Define your database context class
@@ -57,7 +48,7 @@ namespace SignatureStatuses
         public DbSet<UpgradeEvent> UpgradeEvents { get; set; }
         public DbSet<WithdrawEvent> WithdrawEvents { get; set; }
         public DbSet<SignatureModel> SignatureModels { get; set; }
-
+        public DbSet<LastSignature> lastSignatures { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
