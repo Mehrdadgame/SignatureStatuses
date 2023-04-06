@@ -9,7 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" Version="2.0.2" />
     <PackageReference Include="Hexarc.Borsh" Version="1.0.0" />
+    <PackageReference Include="kafka-sharp" Version="1.4.3" />
     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.15.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.3" />

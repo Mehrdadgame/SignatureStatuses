@@ -3,4 +3,4 @@ using SignatureStatuses;
 
 Console.WriteLine("Hello, World!");
 var classSig =  new SigatureInfo();
-classSig.GetInfoSignature();
+  classSig.GetInfoSignature();
