@@ -19,13 +19,13 @@ namespace SignatureStatuses
 
 
 
-        public static void SaveModelsToDatabase<T>(List<T> models, DbSet<T> dbSet, MyDbContext myDbContext) where T : class
+        public static void SaveModelsToDatabase<T>(List<T> models, MyDbContext myDbContext) where T : class
         {
 
 
             foreach (var model in models)
             {
-                dbSet.Add(model);
+                myDbContext.Add(model);
 
             }
             myDbContext.SaveChanges();

@@ -90,7 +90,7 @@ namespace SignatureStatuses
             this.Timestamp = timestamp;
         }
 
-        public static RerollEvent DesrelizeLRerollEvent(byte[] data)
+        public static RerollEvent DeserializeRerollEvent(byte[] data)
         {
             var reder = new BorshReader(data);
             var id = reder.ReadInt64();
