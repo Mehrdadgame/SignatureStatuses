@@ -13,8 +13,10 @@ namespace SignatureStatuses
         private readonly int transactionCount = 10;
         private string saveLastSignture;
         private object? typeEvent;
+
         private object? eventObject;
 
+/*
         /// <summary>
         // The GetInfoSignature() method retrieves the latest message from the Kafka database and retrieves the last signature index.// Then, it loops through each signature in the list of signature status information and creates a new list of signature models for each signature, which are then saved to the database.
         // Next, it retrieves the transaction corresponding to the current signature and processes the log messages to determine the type of event and event data. Finally, it saves the last signature and updates the database. This method appears to be part of a larger system for processing blockchain events and logging them in a Kafka database.
@@ -140,7 +142,11 @@ namespace SignatureStatuses
         //
         //     SaveLastSinature(saveLastSignture, _dbContext);
         // }
-
+        */
+        /// <summary>
+        // The GetInfoSignature() method retrieves the latest message from the Kafka database and retrieves the last signature index.// Then, it loops through each signature in the list of signature status information and creates a new list of signature models for each signature, which are then saved to the database.
+        // Next, it retrieves the transaction corresponding to the current signature and processes the log messages to determine the type of event and event data. Finally, it saves the last signature and updates the database. This method appears to be part of a larger system for processing blockchain events and logging them in a Kafka database.
+        /// </summary>
         public void GetInfoSignature()
         {
             var signaturesLast = new RequestResult<List<SignatureStatusInfo>>();
@@ -241,9 +247,8 @@ namespace SignatureStatuses
                 }
             }
 
-            SaveLastSinature(saveLastSignture, _dbContext);
+            SaveLastSingature(saveLastSignture, _dbContext);
         }
-
 
 
         private void LastSignatureIndex(MyDbContext db, int transactionCount,
@@ -262,7 +267,7 @@ namespace SignatureStatuses
             }
         }
 
-        private void SaveLastSinature(string sign, MyDbContext db)
+        private void SaveLastSingature(string sign, MyDbContext db)
         {
             var firstEntity = db.lastSignatures.FirstOrDefault();
             if (firstEntity != null)
